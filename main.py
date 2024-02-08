@@ -3,7 +3,10 @@ from openai import OpenAI
 import speech_recognition as sr
 from config import apikey
 import os
+import re
 import webbrowser
+
+
 chatStr = ""
 
 def chat(query):
@@ -20,7 +23,7 @@ def chat(query):
         frequency_penalty=0,
         presence_penalty=0
     )
-    # todo: wrap inside a try catch block
+
 
     chatStr += f"{response.choices[0].text}\n"
     say(response.choices[0].text)
@@ -41,8 +44,8 @@ def ai(prompt):
     )
     # todo: wrap inside a try catch block
 
-    text += response.choices[0].text
 
+    text += response.choices[0].text
 
     if not os.path.exists("Openai"):
         os.mkdir("Openai")
@@ -51,9 +54,8 @@ def ai(prompt):
         f.write(text)
 
 
-
-def say(text):
-    os.system(f"say {text}")
+def say(text, speed=200, voice='Samantha'):
+    os.system(f"say -r {speed} -v {voice} {text}")
 
 def input():
     r = sr.Recognizer()
@@ -69,26 +71,39 @@ def input():
             return "Some Error occured, Sorry"
 if __name__ == '__main__':
     print('PyCharm')
-    say("Hello i m dk")
+    say("Hello i am your assistant from NurtureHeal may i know your name?")
+    print("Listening...")
+    query = input()
+    result = re.findall('\\b[A-Z][A-Za-z]+\\b', query)
+
     while True:
-        print("Listening...")
-        query = input()
-        sites = [["youtube", "https://youtube.com"], ["wikipedia", "https://wikipedia.com"], ["google", "https://google.com"],]
-        for site in sites:
-            if f"Open {site[0]}".lower() in query.lower():
-                say(f"Opening {site[0]} sir")
-                webbrowser.open(site[1])
+
+        # sites = [["youtube", "https://youtube.com"], ["wikipedia", "https://wikipedia.com"], ["google", "https://google.com"],]
+        # for site in sites:
+        #     if f"Open {site[0]}".lower() in query.lower():
+        #         say(f"Opening {site[0]} sir")
+        #         webbrowser.open(site[1])
         # say(query)
-        if f"what are you doing".lower() in query.lower():
-            say("just chilling sir")
+        say(f"{result[0]} Are you facing any physical or mental pain?")
+        print("Listening...")
 
-        elif "Using artificial intelligence".lower() in query.lower():
-            ai(prompt=query)
-        elif "AI Quit".lower() in query.lower():
-            exit()
+        query = input()
+        if (query=="physical pain"):
+            say(f"{result[0]} at what place you are feeling pain in the body upper or lower body?")
+            query = input()
 
-        elif "reset chat".lower() in query.lower():
-            chatStr = ""
+
+
+        # if f"what are you doing".lower() in query.lower():
+        #     say("just chilling sir")
+
+        # elif "Using artificial intelligence".lower() in query.lower():
+        #     ai(prompt=query)
+        # elif "AI Quit".lower() in query.lower():
+        #     exit()
+        #
+        # elif "reset chat".lower() in query.lower():
+        #     chatStr = ""
         else:
             print("Chatting...")
             chat(query)
